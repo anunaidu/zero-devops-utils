@@ -10,7 +10,7 @@ class ServiceChangeInImage:
         # current working directory of python file
         self.currentDirectory = os.getcwd()
         # csv file path to store output of comparison
-        self.csvFilePath = os.path.join(self.currentDirectory, f'kustomization{datetime.now().strftime("%d%m%Y%H%M%S")}.csv')
+        self.csvFilePath = os.path.join(self.currentDirectory, f'service-changes-{datetime.now().strftime("%d-%m-%Y-%H:%M:%S")}.csv')
 
 
     # find the difference of 2 version on a specific folder in git clone
