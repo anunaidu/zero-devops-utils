@@ -3,11 +3,14 @@ import csv
 from datetime import datetime
 
 class ServiceChangedInImage:
-    def __init__(self):
+    def __init__(self,base_version,current_version):
+        print('Processing the GitHub Difference to find Service Changed from Image...')
+        self.base_version = base_version
+        self.current_version = current_version
         # current working directory of python file
         self.currentDirectory = os.getcwd()
         # csv file path to store output of comparison
-        self.csvFilePath = os.path.join(self.currentDirectory, f'service-changes-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}.csv')
+        self.csvFilePath = os.path.join(self.currentDirectory, f'service-changed-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}.csv')
 
     def get_diff_service_name(self, list_git_diff_response):
 
@@ -59,38 +62,18 @@ class ServiceChangedInImage:
                                 list_digest_data = []
 
         if list_service_name is not None or list_service_name != '':
+            print(f'Found {len(list_service_name)} service changed images in Github diff...')
             self.write_service_name_to_csv(list_service_name)
+        else:
+            print('Service changes in image not found...')
 
     def write_service_name_to_csv(self, list_service_name):
+        print('Writing service changes image data to csv...')
         with open(self.csvFilePath, mode='w', newline="") as file:
             wr = csv.writer(file, delimiter=',')
-            wr.writerow(['Service Changed'])
+            wr.writerow([f'Services Changed ({self.base_version} -> {self.current_version})'])
             for x in list_service_name:
                 wr.writerow([x])
             file.close()
         print('Service changed data saved into csv file at location \n', self.csvFilePath)
 
-    def segregate_git_diff(self, diff_response):
-        list_git_diff_response = []
-        if diff_response is not None or diff_response != '':
-            # split the response with new line to segregate the data into list
-            list_response = diff_response.split('\n')
-            # variable to segregate the data from diff --git
-            diff_git_data = ''
-            # loop the response data to segregate based on the diff -git key
-            for data in list_response:
-                if 'diff --git' in data:
-                    # add data to list if next diff --git keyword occurs
-                    if diff_git_data != '':
-                        list_git_diff_response.append(diff_git_data)
-                    # reset when next diff --git keyword occurs
-                    diff_git_data = ''
-
-                # collect all the diff --git data into one string
-                diff_git_data = (diff_git_data + '\n' + data).strip()
-
-            # add data to list if last diff --git keyword occurs
-            if diff_git_data != '':
-                list_git_diff_response.append(diff_git_data)
-
-        return list_git_diff_response
