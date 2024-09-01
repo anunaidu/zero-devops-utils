@@ -3,7 +3,7 @@ import csv
 from datetime import datetime
 
 
-class ServiceChangedInFolder:
+class ServiceChangedInOverlays:
     def __init__(self,base_version,current_version):
         print('Processing the GitHub Difference to find Service Added...')
         # current working directory of python file
@@ -11,11 +11,12 @@ class ServiceChangedInFolder:
         self.current_version = current_version
         self.currentDirectory = os.getcwd()
         # csv file path to store output of comparison
-        self.csvFilePath = os.path.join(self.currentDirectory, f'service-added-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}.csv')
+        self.csvFilePath = os.path.join(self.currentDirectory, f'service-overlays-{datetime.now().strftime("%d-%m-%Y-%H-%M-%S")}.csv')
 
     def get_diff_service_name(self, list_git_diff_response):
         list_code_accept = ['A']
         list_git_diff_response = [x for x in list_git_diff_response if x.strip()[0].strip() in list_code_accept]
+        list_git_diff_response = [x for x in list_git_diff_response if '/overlays/' in x]
         list_service_name = []
 
         for git_diff in list_git_diff_response:
@@ -45,7 +46,7 @@ class ServiceChangedInFolder:
         print('Writing service added data to csv...')
         with open(self.csvFilePath, mode='w', newline="") as file:
             wr = csv.writer(file, delimiter=',')
-            wr.writerow([f'Service Added ({self.base_version} -> {self.current_version})'])
+            wr.writerow([f'Service changed in Overlays ({self.base_version} -> {self.current_version})'])
             for x in list_service_name:
                 wr.writerow([x])
             file.close()

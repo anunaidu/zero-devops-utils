@@ -85,3 +85,19 @@ class GitCommands:
                 list_git_diff_response.append(diff_git_data)
 
         return list_git_diff_response
+
+
+    def get_subfolders_names_of_folder_path(self, branch, folder_path):
+        subfolders = []
+        try:
+            # Run the Git command to get subfolders
+            command = ['git', '-C', f'{os.path.expanduser("~")}/zero-deployment/', 'ls-tree', '-d', '--name-only', branch, folder_path]
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
+
+            # Process the output to get the list of subfolders
+            subfolders = result.stdout.splitlines()
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error: {e.stderr}")
+
+        return subfolders
