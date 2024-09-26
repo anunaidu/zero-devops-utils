@@ -1,0 +1,35 @@
+name: Trigger Automerge
+
+on:
+  push:
+    branches:
+      - rel1
+      - rel2
+
+jobs:
+  trigger-automerge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Automerge Workflow
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/anunaidu/sample-repository/dispatches \
+            -d '{
+              "event_type": "automerge-trigger",
+              "client_payload": {
+                "repo": "zero-devops-utils",
+                "branch_combinations": [
+                  {
+                    "source_branch": "rel1",
+                    "target_branch": "main"
+                  },
+                  {
+                    "source_branch": "rel2",
+                    "target_branch": "main"
+                  }
+                ]
+              }
+            }'
